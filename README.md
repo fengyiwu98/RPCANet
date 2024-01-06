@@ -1,12 +1,12 @@
 # RPCANet
 **[WACV2024]** Official implementation of paper "RPCANet: Deep Unfolding RPCA Based Infrared Small Target Detection".
+============The codes will be upcoming soon!==============
 
 ## Abstract
 Deep learning (DL) networks have achieved remarkable performance in infrared small target detection (ISTD). However, these structures exhibit a deficiency in interpretability and are widely regarded as black boxes, as they disregard domain knowledge in ISTD. To alleviate this issue, this work proposes an interpretable deep network for detecting infrared dim targets, dubbed RPCANet. Specifically, our approach formulates the ISTD task as sparse target extraction, low-rank background estimation, and image reconstruction in a relaxed Robust Principle Component Analysis (RPCA) model. By unfolding the iterative optimization updating steps into a deep-learning framework, time-consuming and complex matrix calculations are replaced by theory-guided neural networks. RPCANet detects targets with clear interpretability and preserves the intrinsic image feature, instead of directly transforming the detection task into a matrix decomposition problem. Extensive experiments substantiate the effectiveness of our deep unfolding framework and demonstrate its trustworthy results, surpassing baseline methods in both qualitative and quantitative evaluations.
 
 ## Network Architecture
-![network_architecture](https://github.com/fengyiwu98/RPCANet/assets/115853729/17b1b772-9dd6-4942-b6b3-a6bf81bd4dd8)
-
+![network_architecture](https://github.com/fengyiwu98/RPCANet/assets/115853729/85d53cf7-48ca-4099-ba05-943cb9811193)
 
 
 ## Requirements
@@ -49,41 +49,15 @@ Deep learning (DL) networks have achieved remarkable performance in infrared sma
 ```
 <br>
 
-## Commands for Training
-* **Run** `run_0.py` **to perform network training:**
-```bash
-$ python run_0.py
-```
-
-## Commands for Evaluate your own results
-* **Run** `t_models.py` **to generate file of the format .mat and .png:**
-```bash
-$ python t_models.py
-```
-* **The file generated will be saved to** `./results/` **that has the following structure**:
-```
-├──./results/
-│    ├── [dataset_name]
-│    │   ├── img
-│    │   │    ├── 000000.png
-│    │   │    ├── 000001.png
-│    │   │    ├── ...
-│    │   ├── mat
-│    │   │    ├── 000000.mat
-│    │   │    ├── 000001.mat
-│    │   │    ├── ...
-```
-* **Run** `cal_from_mask.py` **for direct evaluation**:
-```bash
-$ python cal_from_mask.py
-```
 
 ## Citation
 ```
-@article{wu2023rpcanet,
-  title={RPCANet: Deep Unfolding RPCA Based Infrared Small Target Detection},
-  author={Wu, Fengyi and Zhang, Tianfang and Li, Lei and Huang, Yian and Peng, Zhenming},
-  journal={arXiv preprint arXiv:2311.00917},
-  year={2023}
+@InProceedings{Wu_2024_WACV,
+    author    = {Wu, Fengyi and Zhang, Tianfang and Li, Lei and Huang, Yian and Peng, Zhenming},
+    title     = {RPCANet: Deep Unfolding RPCA Based Infrared Small Target Detection},
+    booktitle = {Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)},
+    month     = {January},
+    year      = {2024},
+    pages     = {4809-4818}
 }
 ```
