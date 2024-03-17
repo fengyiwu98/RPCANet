@@ -51,6 +51,34 @@ Deep learning (DL) networks have achieved remarkable performance in infrared sma
 ```
 <br>
 
+## Commands for Training
+* **Run** `run_0.py` **to perform network training:**
+```bash
+$ python run_0.py
+```
+
+## Commands for Evaluate your own results
+* **Run** `t_models.py` **to generate file of the format .mat and .png:**
+```bash
+$ python t_models.py
+```
+* **The file generated will be saved to** `./results/` **that has the following structure**:
+```
+├──./results/
+│    ├── [dataset_name]
+│    │   ├── img
+│    │   │    ├── 000000.png
+│    │   │    ├── 000001.png
+│    │   │    ├── ...
+│    │   ├── mat
+│    │   │    ├── 000000.mat
+│    │   │    ├── 000001.mat
+│    │   │    ├── ...
+```
+* **Run** `cal_from_mask.py` **for direct evaluation**:
+```bash
+$ python cal_from_mask.py
+```
 
 ## Citation
 ```
