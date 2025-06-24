@@ -94,33 +94,33 @@ class Trainer(object):
 
         ## dataset
         if args.dataset == 'sirstaug':
-            trainset = SirstAugDataset(base_dir=r'D:\WFY\datasets\sirst_aug',
+            trainset = SirstAugDataset(base_dir=r'./datasets/sirst_aug',
                                        mode='train', base_size=args.base_size)
-            valset = SirstAugDataset(base_dir=r'D:\WFY\datasets\sirst_aug',
+            valset = SirstAugDataset(base_dir=r'./datasets/sirst_aug',
                                      mode='test', base_size=args.base_size)
         elif args.dataset == 'irstd1k':
-            trainset = IRSTD1kDataset(base_dir=r'D:\WFY\datasets\IRSTD-1k', mode='train', base_size=args.base_size)
-            valset = IRSTD1kDataset(base_dir=r'D:\WFY\datasets\IRSTD-1k', mode='test', base_size=args.base_size)
+            trainset = IRSTD1kDataset(base_dir=r'./datasets/IRSTD-1k', mode='train', base_size=args.base_size)
+            valset = IRSTD1kDataset(base_dir=r'./datasets/IRSTD-1k', mode='test', base_size=args.base_size)
 
         elif args.dataset == 'nudt':
-            trainset = NUDTDataset(base_dir=r'D:\WFY\datasets\NUDT-SIRST', mode='train', base_size=args.base_size)
-            valset = NUDTDataset(base_dir=r'D:\WFY\datasets\NUDT-SIRST', mode='test', base_size=args.base_size)
+            trainset = NUDTDataset(base_dir=r'./datasets/NUDT-SIRST', mode='train', base_size=args.base_size)
+            valset = NUDTDataset(base_dir=r'./datasets/NUDT-SIRST', mode='test', base_size=args.base_size)
 
         elif args.dataset == 'sirst':
-            trainset = SirstDataset(base_dir=r'D:\WFY\datasets\sirst', mode='train', base_size=args.base_size)
-            valset = SirstDataset(base_dir=r'D:\WFY\datasets\sirst', mode='val', base_size=args.base_size)
+            trainset = SirstDataset(base_dir=r'./datasets/sirst', mode='train', base_size=args.base_size)
+            valset = SirstDataset(base_dir=r'./datasets/sirst', mode='val', base_size=args.base_size)
 
         elif args.dataset == 'drive':
-            trainset = DriveDatasetTrain(base_dir=r'D:\WFY\datasets\DRIVE', mode='train', base_size=args.base_size, patch_size=args.crop_size)
-            valset = DriveDatasetTest(base_dir=r'D:\WFY\datasets\DRIVE', mode='test', base_size=args.base_size)
+            trainset = DriveDatasetTrain(base_dir=r'./datasets/DRIVE', mode='train', base_size=args.base_size, patch_size=args.crop_size)
+            valset = DriveDatasetTest(base_dir=r'./datasets/DRIVE', mode='test', base_size=args.base_size)
 
         elif args.dataset == 'CHASEDB1':
-            trainset = CHASEDB1DatasetTrain(base_dir=r'D:\WFY\datasets\CHASEDB1', mode='train', base_size=args.base_size, patch_size=args.crop_size)
-            valset = CHASEDB1DatasetTest(base_dir=r'D:\WFY\datasets\CHASEDB1', mode='test', base_size=args.base_size)
+            trainset = CHASEDB1DatasetTrain(base_dir=r'./datasets/CHASEDB1', mode='train', base_size=args.base_size, patch_size=args.crop_size)
+            valset = CHASEDB1DatasetTest(base_dir=r'./datasets/CHASEDB1', mode='test', base_size=args.base_size)
 
         elif args.dataset == 'stare':
-            trainset = STAREDatasetTrain(base_dir=r'D:\WFY\datasets\STARE', mode='train', base_size=args.base_size, patch_size=args.crop_size)
-            valset = STAREDatasetTest(base_dir=r'D:\WFY\datasets\STARE', mode='test', base_size=args.base_size)
+            trainset = STAREDatasetTrain(base_dir=r'./datasets/STARE', mode='train', base_size=args.base_size, patch_size=args.crop_size)
+            valset = STAREDatasetTest(base_dir=r'./datasets/STARE', mode='test', base_size=args.base_size)
         else:
             raise NotImplementedError
 
