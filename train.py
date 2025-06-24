@@ -14,8 +14,9 @@ from models import get_model
 from utils.data import *
 from utils.loss import SoftLoULoss
 from utils.lr_scheduler import *
-from utils.evaluation.my_pd_fa import my_PD_FA
-from utils.evaluation.TPFNFP import SegmentationMetricTPFNFP
+from utils.metrics import SegmentationMetricTPFNFP
+from utils.my_pd_fa import *
+from utils.pd_fa import *
 from utils.logger import setup_logger
 
 
@@ -23,14 +24,14 @@ def parse_args():
     #
     # Setting parameters
     #
-    parser = ArgumentParser(description='Implement of RPCANet')
+    parser = ArgumentParser(description='Implement of RPCANets')
 
     #
     # Dataset parameters
     #
     parser.add_argument('--base-size', type=int, default=256, help='base size of images')
     parser.add_argument('--crop-size', type=int, default=256, help='crop size of images')
-    parser.add_argument('--dataset', type=str, default='nudt', help='choose datasets')
+    parser.add_argument('--dataset', type=str, default='sirst', help='choose datasets')
 
     #
     # Training parameters
@@ -39,9 +40,9 @@ def parse_args():
     parser.add_argument('--batch-size', type=int, default=8, help='batch size for training')
     parser.add_argument('--epochs', type=int, default=50, help='number of epochs')
     parser.add_argument('--warm-up-epochs', type=int, default=0, help='warm up epochs')
-    parser.add_argument('--lr', type=float, default=1e-4, help='learning rate')
+    parser.add_argument('--lr', type=float, default=5e-4, help='learning rate')
     parser.add_argument('--gpu', type=str, default='0', help='GPU number')
-    parser.add_argument('--seed', type=int, default=1, help='seed')
+    parser.add_argument('--seed', type=int, default=42, help='seed')
     parser.add_argument('--lr-scheduler', type=str, default='poly', help='learning rate scheduler')
 
     #
@@ -59,12 +60,11 @@ def parse_args():
     #
     parser.add_argument('--save-iter-step', type=int, default=1, help='save model per step iters')
     parser.add_argument('--log-per-iter', type=int, default=1, help='interval of logging')
-    parser.add_argument('--base-dir', type=str, default='../result/', help='saving dir')
+    parser.add_argument('--base-dir', type=str, default='./result/', help='saving dir')
 
     args = parser.parse_args()
 
     # Save folders
-    #args.base_dir = r'D:\WFY\dun_irstd\result'
     args.time_name = time.strftime('%Y%m%dT%H-%M-%S', time.localtime(time.time()))
     args.folder_name = '{}_{}_{}'.format(args.time_name, args.net_name, args.dataset)
     args.save_folder = osp.join(args.base_dir, args.folder_name)
@@ -74,7 +74,7 @@ def parse_args():
         set_seeds(args.seed)
 
     # logger
-    args.logger = setup_logger("Robust PCA Network", args.save_folder, 0, filename='log.txt')
+    args.logger = setup_logger("Robust PCA Networks", args.save_folder, 0, filename='log.txt')
     return args
 
 
@@ -94,16 +94,33 @@ class Trainer(object):
 
         ## dataset
         if args.dataset == 'sirstaug':
-            trainset = SirstAugDataset(base_dir=r'./datasets/sirst_aug',
-                                       mode='train', base_size=args.base_size)  # base_dir=r'E:\ztf\datasets\sirst_aug'
-            valset = SirstAugDataset(base_dir=r'./datasets/sirst_aug',
-                                     mode='test', base_size=args.base_size)  # base_dir=r'E:\ztf\datasets\sirst_aug'
+            trainset = SirstAugDataset(base_dir=r'D:\WFY\datasets\sirst_aug',
+                                       mode='train', base_size=args.base_size)
+            valset = SirstAugDataset(base_dir=r'D:\WFY\datasets\sirst_aug',
+                                     mode='test', base_size=args.base_size)
         elif args.dataset == 'irstd1k':
-            trainset = IRSTD1kDataset(base_dir=r'./datasets/IRSTD-1k', mode='train', base_size=args.base_size) # base_dir=r'E:\ztf\datasets\IRSTD-1k'
-            valset = IRSTD1kDataset(base_dir=r'./datasets/IRSTD-1k', mode='test', base_size=args.base_size) # base_dir=r'E:\ztf\datasets\IRSTD-1k'
+            trainset = IRSTD1kDataset(base_dir=r'D:\WFY\datasets\IRSTD-1k', mode='train', base_size=args.base_size)
+            valset = IRSTD1kDataset(base_dir=r'D:\WFY\datasets\IRSTD-1k', mode='test', base_size=args.base_size)
+
         elif args.dataset == 'nudt':
-            trainset = NUDTDataset(base_dir=r'./datasets/NUDT-SIRST', mode='train', base_size=args.base_size) # base_dir=r'E:\ztf\datasets\IRSTD-1k'
-            valset = NUDTDataset(base_dir=r'./datasets/NUDT-SIRST', mode='test', base_size=args.base_size) # base_dir=r'E:\ztf\datasets\IRSTD-1k'
+            trainset = NUDTDataset(base_dir=r'D:\WFY\datasets\NUDT-SIRST', mode='train', base_size=args.base_size)
+            valset = NUDTDataset(base_dir=r'D:\WFY\datasets\NUDT-SIRST', mode='test', base_size=args.base_size)
+
+        elif args.dataset == 'sirst':
+            trainset = SirstDataset(base_dir=r'D:\WFY\datasets\sirst', mode='train', base_size=args.base_size)
+            valset = SirstDataset(base_dir=r'D:\WFY\datasets\sirst', mode='val', base_size=args.base_size)
+
+        elif args.dataset == 'drive':
+            trainset = DriveDatasetTrain(base_dir=r'D:\WFY\datasets\DRIVE', mode='train', base_size=args.base_size, patch_size=args.crop_size)
+            valset = DriveDatasetTest(base_dir=r'D:\WFY\datasets\DRIVE', mode='test', base_size=args.base_size)
+
+        elif args.dataset == 'CHASEDB1':
+            trainset = CHASEDB1DatasetTrain(base_dir=r'D:\WFY\datasets\CHASEDB1', mode='train', base_size=args.base_size, patch_size=args.crop_size)
+            valset = CHASEDB1DatasetTest(base_dir=r'D:\WFY\datasets\CHASEDB1', mode='test', base_size=args.base_size)
+
+        elif args.dataset == 'stare':
+            trainset = STAREDatasetTrain(base_dir=r'D:\WFY\datasets\STARE', mode='train', base_size=args.base_size, patch_size=args.crop_size)
+            valset = STAREDatasetTest(base_dir=r'D:\WFY\datasets\STARE', mode='test', base_size=args.base_size)
         else:
             raise NotImplementedError
 
@@ -119,8 +136,6 @@ class Trainer(object):
 
         ## model
         self.net = get_model(args.net_name)
-
-        # self.net.apply(self.weight_init)
         self.net = self.net.to(self.device)
 
         ## criterion
@@ -132,19 +147,17 @@ class Trainer(object):
                                            args.epochs, len(self.train_data_loader), lr_step=10)
 
         ## optimizer
-        # self.optimizer = torch.optim.Adagrad(self.net.parameters(), lr=args.learning_rate, weight_decay=1e-4)
-        # self.optimizer = torch.optim.SGD(self.net.parameters(), lr=args.learning_rate,
-        #                                  momentum=0.9, weight_decay=1e-4)
         self.optimizer = torch.optim.Adam(self.net.parameters(), lr=args.lr)
 
         ## evaluation metrics
         self.metric = SegmentationMetricTPFNFP(nclass=1)
-        self.best_miou = 0
+        self.best_iou = 0
         self.best_fmeasure = 0
         self.eval_loss = 0  # tmp values
-        self.miou = 0
+        self.iou = 0
         self.fmeasure = 0
         self.eval_my_PD_FA = my_PD_FA()
+        self.eval_PD_FA = PD_FA()
 
         ## SummaryWriter
         self.writer = SummaryWriter(log_dir=args.save_folder)
@@ -164,7 +177,7 @@ class Trainer(object):
             for i, (data, labels) in enumerate(self.train_data_loader):
                 self.net.train()
 
-                self.scheduler(self.optimizer, i, epoch, self.best_miou)
+                self.scheduler(self.optimizer, i, epoch, self.best_iou)
 
                 data = data.to(self.device)
 
@@ -173,7 +186,7 @@ class Trainer(object):
 
                 loss_softiou = self.softiou(out_T, labels)
                 loss_mse = self.mse(out_D, data)
-                gamma = torch.Tensor([0.1]).to(self.device)
+                gamma = torch.Tensor([0.01]).to(self.device)
                 loss_all = loss_softiou + torch.mul(gamma, loss_mse)
 
                 self.optimizer.zero_grad()
@@ -202,40 +215,37 @@ class Trainer(object):
 
     def validation(self):
         self.metric.reset()
-        # self.eval_my_PD_FA.reset()
         self.net.eval()
-        base_log = "Data: {:s}, mIoU: {:.4f}/{:.4f}, F1: {:.4f}/{:.4f} "
-        # base_log = "Data: {:s}, mIoU: {:.4f}/{:.4f}, F1: {:.4f}/{:.4f}, Pd:{:.4f}, Fa:{:.8f} "
+        base_log = "Data: {:s}, IoU: {:.4f}/{:.4f}, F1: {:.4f}/{:.4f} "
         for i, (data, labels) in enumerate(self.val_data_loader):
             with torch.no_grad():
                 out_D, out_T = self.net(data.to(self.device))
             out_D, out_T = out_D.cpu(), out_T.cpu()
-            pred = out_T
+
 
 
             loss_softiou = self.softiou(out_T, labels)
             loss_mse = self.mse(out_D, data)
-            gamma = torch.Tensor([0.1]).to(self.device)
+            gamma = torch.Tensor([0.01]).to(self.device)
             loss_all = loss_softiou + torch.mul(gamma, loss_mse)
 
             self.metric.update(labels, out_T)
 
 
-        miou, prec, recall, fmeasure = self.metric.get()
+        iou, prec, recall, fmeasure = self.metric.get()
         torch.save(self.net.state_dict(), osp.join(self.args.save_folder, 'latest.pkl'))
-        if miou > self.best_miou:
-            self.best_miou = miou
+        if iou > self.best_iou:
+            self.best_iou = iou
             torch.save(self.net.state_dict(), osp.join(self.args.save_folder, 'best.pkl'))
         if fmeasure > self.best_fmeasure:
             self.best_fmeasure = fmeasure
 
 
-        self.writer.add_scalar('Test/mIoU', miou, self.iter_num)
+        self.writer.add_scalar('Test/IoU', iou, self.iter_num)
         self.writer.add_scalar('Test/F1', fmeasure, self.iter_num)
-        self.writer.add_scalar('Best/mIoU', self.best_miou, self.iter_num)
+        self.writer.add_scalar('Best/IoU', self.best_iou, self.iter_num)
         self.writer.add_scalar('Best/Fmeasure', self.best_fmeasure, self.iter_num)
-
-        self.logger.info(base_log.format(self.args.dataset, miou, self.best_miou, fmeasure, self.best_fmeasure))
+        self.logger.info(base_log.format(self.args.dataset, iou, self.best_iou, fmeasure, self.best_fmeasure))
 
 
 if __name__ == '__main__':
@@ -245,4 +255,4 @@ if __name__ == '__main__':
     trainer = Trainer(args)
     trainer.training()
 
-    print('Best mIoU: %.5f, Best Fmeasure: %.5f\n\n' % (trainer.best_miou, trainer.best_fmeasure))
+    print('Best mIoU: %.5f, Best Fmeasure: %.5f\n\n' % (trainer.best_iou, trainer.best_fmeasure))
