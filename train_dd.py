@@ -95,15 +95,15 @@ class Trainer(object):
         ## dataset
 
         if args.dataset == 'neu':
-            trainset = NEUDatasetTrain(base_dir=r'D:\WFY\datasets\NEU', mode='train',
+            trainset = NEUDatasetTrain(base_dir=r'./datasets/NEU', mode='train',
                                   base_size=args.base_size, patch_size=args.crop_size)
-            valset = NEUDatasetTest(base_dir=r'D:\WFY\datasets\NEU', mode='test',
+            valset = NEUDatasetTest(base_dir=r'./datasets/NEU', mode='test',
                                 base_size=args.base_size, patch_size=args.crop_size)
         elif args.dataset == 'saliency':
-            trainset = SaliencyDatasetTrain(base_dir=r'D:\WFY\datasets\Saliency', mode='train',
+            trainset = SaliencyDatasetTrain(base_dir=r'./datasets/Saliency', mode='train',
                                        base_size=args.base_size,
                                        patch_size=args.crop_size)
-            valset = SaliencyDatasetTest(base_dir=r'D:\WFY\datasets\Saliency', mode='test',
+            valset = SaliencyDatasetTest(base_dir=r'./datasets/Saliency', mode='test',
                                     base_size=args.base_size,
                                     patch_size=args.crop_size)
         else:
